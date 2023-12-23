@@ -1,11 +1,19 @@
 from marshmallow import Schema, fields
 
 """Schema for getting or creating a product"""
-class ProductSchema(Schema):
+class PlainProductSchema(Schema):
     id = fields.Str(dump_only=True)
     name = fields.Str(required=True)
     price = fields.Float(required=True)
+
+class PlainShopSchema(Schema):
+    id = fields.Str(dump_only=True)
+    name = fields.Str(required=True)
+
+
+class ProductSchema(PlainProductSchema):
     shop_id = fields.Str(required=True)
+    shop = fields.Nested(PlainShopSchema(), dump_only=True)
 
 
 class ProductUpdateSchema(Schema):
@@ -13,9 +21,9 @@ class ProductUpdateSchema(Schema):
     price = fields.Float()
 
 
-class ShopSchema(Schema):
-    id = fields.Str(dump_only=True)
-    name = fields.Str(required=True)
+class ShopSchema(PlainShopSchema):
+    products = fields.List(fields.Nested(PlainShopSchema()),
+                           dump_only=True)
 
 class ShopUpdateSchema(Schema):
     name = fields.Str()
