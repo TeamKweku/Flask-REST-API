@@ -12,10 +12,28 @@ services:
       "app:app"
     volumes:
       - '.:/app'
+      - './mysqlData:/mysqlData'
     ports:
       - "5000:5000"
+    depends_on:
+      - mysql
+    restart: always
     networks:
       - ecommerce_net
+
+  mysql:
+    image: mysql
+    env_file:
+      - .env
+    ports:
+      - '3306:3306'
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: '$(MYSQL_ROOT_PASSWORD)'
+    networks:
+      - ecommerce_net
+    volumes:
+      - ./mysqlData:/var/lib/mysql
 
 networks:
   ecommerce_net:
