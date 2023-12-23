@@ -41,7 +41,7 @@ class Shop(MethodView):
 class ShopList(MethodView):
     @blueprint.response(200, ShopSchema(many=True)) # many=True -> means its a list
     def get(self):
-        return {"shops": list(shops.values())}
+        return list(shops.values())
 
     @blueprint.arguments(ShopSchema)
     @blueprint.response(200, ShopSchema)
