@@ -9,10 +9,12 @@ blueprint = Blueprint("products", __name__, description="Operations on products"
 
 @blueprint.route("/product")
 class ProductList(MethodView):
+    @blueprint.response(200, ProductSchema(many=True))
     def get(self):
         return {"products": list(products.values())}
 
     @blueprint.arguments(ProductSchema)
+    @blueprint.response(200, ProductSchema)
     def post(self, product_data):
         # product_data = request.json
 
@@ -30,6 +32,7 @@ class ProductList(MethodView):
 
 @blueprint.route("/product/<product_id>")
 class Product(MethodView):
+    @blueprint.response(200, ProductSchema)
     def get(self, product_id):
         try:
             return products[product_id]
@@ -44,6 +47,7 @@ class Product(MethodView):
             abort(404, message="product not found")
 
     @blueprint.arguments(ProductUpdateSchema)
+    @blueprint.response(201, ProductUpdateSchema)
     def put(self, product_data, product_id):
         # product_data = request.json
         # if "price" not in product_data or "name" not in product_data:

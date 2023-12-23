@@ -10,6 +10,7 @@ blueprint = Blueprint("shops", __name__, description="Operations on shops")
 
 @blueprint.route("/shop/<shop_id>")
 class Shop(MethodView):
+    @blueprint.response(200, ShopSchema)
     def get(self, shop_id):
         try:
             return shops[shop_id]
@@ -24,6 +25,7 @@ class Shop(MethodView):
             abort(404, message="Shop not found")
 
     @blueprint.arguments(ShopUpdateSchema)
+    @blueprint.response(201, ShopUpdateSchema)
     def put(self, shop_data ,shop_id):
         # shop_data = request.json
         # if "price" not in shop_data or "name" not in shop_data:
@@ -37,10 +39,12 @@ class Shop(MethodView):
 
 @blueprint.route("/shop")
 class ShopList(MethodView):
+    @blueprint.response(200, ShopSchema(many=True)) # many=True -> means its a list
     def get(self):
         return {"shops": list(shops.values())}
 
     @blueprint.arguments(ShopSchema)
+    @blueprint.response(200, ShopSchema)
     def post(self, shop_data):
         # shop_data = request.json
 
