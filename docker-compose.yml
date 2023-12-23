@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  website:
+    build: .
+    env_file:
+      - .flaskenv
+    command: >
+      gunicorn -b 0.0.0.0:5000
+      --access-logfile -
+      --reload
+      "app:app"
+    volumes:
+      - '.:/app'
+    ports:
+      - "5000:5000"
+    networks:
+      - ecommerce_net
+
+networks:
+  ecommerce_net:
+    driver: bridge

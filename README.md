@@ -1,2 +1,1 @@
-# Flask-REST-API
-Creating an ecommerce FLask REST API using Flask Smorest
+# Practic Repo using Flask and Flask-Smorest to create a REST API
