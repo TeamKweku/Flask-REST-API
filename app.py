@@ -3,6 +3,7 @@ from flask import Flask, request
 from flask_smorest import Api
 from resources.shop import blueprint as ShopBlueprint
 from resources.product import blueprint as ProductBlueprint
+from flask_migrate import Migrate
 import uuid
 from db import db
 import models
@@ -21,8 +22,14 @@ app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+migrate = Migrate(app, db)
+
 db.init_app(app)
 
 api = Api(app)
+
+# with app.app_context():
+#     db.create_all()
+
 api.register_blueprint(ShopBlueprint)
 api.register_blueprint(ProductBlueprint)

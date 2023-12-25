@@ -6,6 +6,6 @@ class ProductModel(db.Model):
     name = db.Column(db.String(120), unique=True, nullable=False)
     price = db.Column(db.Float(precision=2), unique=False, nullable=False)
 
-    shop_id = db.Column(db.Integer, db.ForiegnKey('shop_id'),
+    shop_id = db.Column(db.Integer, db.ForeignKey('shops.id'),
                         unique=False, nullable=False)
     shop = db.relationship("ShopModel", back_populates="products")
