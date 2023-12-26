@@ -74,7 +74,7 @@ class ShopList(MethodView):
         shops = ShopModel.query.all()
         return shops
 
-    @jwt_required()
+    @jwt_required(fresh=True)
     @blueprint.arguments(ShopSchema)
     @blueprint.response(200, ShopSchema)
     def post(self, shop_data):

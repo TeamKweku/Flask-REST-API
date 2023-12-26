@@ -56,6 +56,11 @@ def missing_token_callback(error):
     return (jsonify({"message": "Request doesn't contain an access token",
                      "error": "authorization required"}), 401)
 
+@jwt.needs_fresh_token_loader
+def token_not_fresh_callback(jwt_header, jwt_payload):
+    return (jsonify({"message": "The token is not a fresh token",
+                     "error": "fresh_token_required"}), 401)
+
 
 db.init_app(app)
 

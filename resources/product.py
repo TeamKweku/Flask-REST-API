@@ -22,7 +22,7 @@ class ProductList(MethodView):
 
         return products
 
-    @jwt_required()
+    @jwt_required(fresh=True)
     @blueprint.arguments(ProductSchema)
     @blueprint.response(200, ProductSchema)
     def post(self, product_data):
@@ -58,7 +58,7 @@ class Product(MethodView):
         
         # except KeyError:
         #     abort(404, message="product not found")
-    @jwt_required()
+    @jwt_required(fresh=True)
     def delete(self, product_id):
         # try:
         #     return {"message": "product deleted"}
