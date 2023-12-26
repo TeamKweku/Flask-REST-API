@@ -2,6 +2,7 @@ from flask import request
 import uuid
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from flask_smorest import Blueprint, abort
+from flask_jwt_extended import  jwt_required
 from flask.views import MethodView
 from schema import ShopSchema, ShopUpdateSchema
 from models import ShopModel
@@ -14,6 +15,7 @@ blueprint = Blueprint("shops", __name__, description="Operations on shops")
 @blueprint.route("/shop/<shop_id>")
 class Shop(MethodView):
     @blueprint.response(200, ShopSchema)
+    @jwt_required()
     def get(self, shop_id):
         # try:
         #     return shops[shop_id]
@@ -22,6 +24,7 @@ class Shop(MethodView):
         shop = ShopModel.query.get_or_404(shop_id)
         return shop
 
+    @jwt_required()
     def delete(self, shop_id):
         # try:
         #     del shops[shop_id]
@@ -34,8 +37,10 @@ class Shop(MethodView):
         
         return {"message": "Shop deleted"}
 
+    @jwt_required()
     @blueprint.arguments(ShopUpdateSchema)
     @blueprint.response(201, ShopUpdateSchema)
+    
     def put(self, shop_data ,shop_id):
         # shop_data = request.json
         # if "price" not in shop_data or "name" not in shop_data:
@@ -62,12 +67,14 @@ class Shop(MethodView):
 
 @blueprint.route("/shop")
 class ShopList(MethodView):
+    @jwt_required()
     @blueprint.response(200, ShopSchema(many=True)) # many=True -> means its a list
     def get(self):
         # return list(shops.values())
         shops = ShopModel.query.all()
         return shops
 
+    @jwt_required()
     @blueprint.arguments(ShopSchema)
     @blueprint.response(200, ShopSchema)
     def post(self, shop_data):

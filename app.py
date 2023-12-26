@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
 from resources.shop import blueprint as ShopBlueprint
@@ -29,6 +29,23 @@ app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
+
+# Handle errors that arises with JWT tokens
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return (jsonify({"message": "Provided token expired",
+                     "error": "token_expired"}), 401)
+
+@jwt.invalid_token_loader
+def invalid_token_loader_callback(error):
+    return (jsonify({"message": "Signature verification failed",
+                     "error": "invalid_token"}), 401)
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return (jsonify({"message": "Request doesn't contain an access token",
+                     "error": "authorization required"}), 401)
+
 
 db.init_app(app)
 

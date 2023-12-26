@@ -2,6 +2,10 @@ from flask import request
 import uuid
 from sqlalchemy.exc import SQLAlchemyError
 from flask_smorest import Blueprint, abort
+
+# proctecting endpoints using jwt_required
+from flask_jwt_extended import  jwt_required
+
 from flask.views import MethodView
 from db import db
 from models import ProductModel, ShopModel
@@ -11,12 +15,14 @@ blueprint = Blueprint("products", __name__, description="Operations on products"
 
 @blueprint.route("/product")
 class ProductList(MethodView):
+    @jwt_required()
     @blueprint.response(200, ProductSchema(many=True))
     def get(self):
         products = ProductModel.query.all()
 
         return products
 
+    @jwt_required()
     @blueprint.arguments(ProductSchema)
     @blueprint.response(200, ProductSchema)
     def post(self, product_data):
@@ -40,8 +46,10 @@ class ProductList(MethodView):
 
         return product
 
+
 @blueprint.route("/product/<product_id>")
 class Product(MethodView):
+    @jwt_required()
     @blueprint.response(200, ProductSchema)
     def get(self, product_id):
         # return products[product_id]
@@ -50,7 +58,7 @@ class Product(MethodView):
         
         # except KeyError:
         #     abort(404, message="product not found")
-
+    @jwt_required()
     def delete(self, product_id):
         # try:
         #     return {"message": "product deleted"}
@@ -61,9 +69,11 @@ class Product(MethodView):
         db.session.commit()
 
         return {"message": "Product deleted"}
-
+    
+    @jwt_required()
     @blueprint.arguments(ProductUpdateSchema)
     @blueprint.response(201, ProductUpdateSchema)
+    
     def put(self, product_data, product_id):
         # product_data = request.json
         # if "price" not in product_data or "name" not in product_data:
@@ -80,7 +90,7 @@ class Product(MethodView):
         product = ProductModel.query.get_or_404(product_id)
         # if product:
         #     product.price = product_data["price"]
-        #     product.price = product_data["name"]
+        #     product.price = product_data["@jwt_required()name"]
         # else:
         #     product = ProductModel(id=product_id, **product_data)
 
@@ -99,6 +109,7 @@ class Product(MethodView):
 # Listing projects by shop id
 @blueprint.route('/shop/<int:shop_id>/products')
 class ProductsByShop(MethodView):
+    @jwt_required()
     @blueprint.response(200, ProductSchema(many=True))
     def get(self, shop_id):
         # Fetch products for the given shop_id
