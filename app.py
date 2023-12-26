@@ -34,7 +34,7 @@ jwt = JWTManager(app)
 # Handle errors that arises with JWT tokens
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
-    return jwt_header["jti"] in BLACKLIST
+    return jwt_payload["jti"] in BLACKLIST
 
 @jwt.revoked_token_loader
 def revoked_token_callback(jwt_header, jwt_payload):

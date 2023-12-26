@@ -31,13 +31,13 @@ class UserRegister(MethodView):
         if UserModel.query.filter(UserModel.username == user_data["username"]).first():
             # abort 409 means conflicting request
             abort(409, message="A username provided already exits")
-             
-            user = UserModel(username=user_data["username"],
-                             password=pbkdf2_sha256.hash(user_data["password"]))
-            db.session.add(user)
-            db.session.commit()
+        
+        user = UserModel(username=user_data["username"],
+                         password=pbkdf2_sha256.hash(user_data["password"]))
+        db.session.add(user)
+        db.session.commit()
 
-            return {"message": "User created successfully"}, 201
+        return {"message": "User created successfully"}, 201
 
 @blueprint.route("/user")        
 class User(MethodView):
@@ -63,7 +63,7 @@ class UserLogin(MethodView):
         abort(401, message="Invalid credentials")
 
 
-@blueprint.route("/login")
+@blueprint.route("/logout")
 class UserLogOut(MethodView):
     @jwt_required()
     def delete(self):
