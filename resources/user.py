@@ -9,6 +9,7 @@ Steps to receive username and password from the client (as JSON)
 
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
+from flask_jwt_extended import create_access_token
 from passlib.hash import pbkdf2_sha256
 
 from db import db
@@ -32,6 +33,9 @@ class UserRegister(MethodView):
             db.session.commit()
 
             return {"message": "User created successfully"}, 201
+
+@blueprint.route("/user")        
+class User(MethodView):
     
     # For development purpose to chech created users
     @blueprint.response(200, UserSchema(many=True))
@@ -39,3 +43,15 @@ class UserRegister(MethodView):
         users = UserModel.query.all()
 
         return users
+    
+@blueprint.route("/login")
+class UserLogin(MethodView):
+    @blueprint.arguments(UserSchema)
+    def post(self, user_data):
+        user = UserModel.query.filter(UserModel.username == user_data["username"]).first()
+
+        if user and pbkdf2_sha256.verify(user_data["password"], user.password):
+            access_token = create_access_token(identity=user.id)
+            return {"access_token": access_token}, 200
+        
+        abort(401, message="Invalid credentials")
