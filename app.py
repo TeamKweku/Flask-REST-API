@@ -9,6 +9,7 @@ from flask_migrate import Migrate
 import uuid
 from db import db
 import models
+from blacklist import BLACKLIST
 
 app = Flask(__name__)
 
@@ -31,6 +32,15 @@ migrate = Migrate(app, db)
 jwt = JWTManager(app)
 
 # Handle errors that arises with JWT tokens
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blacklist(jwt_header, jwt_payload):
+    return jwt_header["jti"] in BLACKLIST
+
+@jwt.revoked_token_loader
+def revoked_token_callback(jwt_header, jwt_payload):
+    return (jsonify({"message": "Token has been revoked",
+                     "error": "revoked_token"}), 401)
+
 @jwt.expired_token_loader
 def expired_token_callback(jwt_header, jwt_payload):
     return (jsonify({"message": "Provided token expired",
