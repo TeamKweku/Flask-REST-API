@@ -9,12 +9,13 @@ Steps to receive username and password from the client (as JSON)
 
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 from passlib.hash import pbkdf2_sha256
 
 from db import db
 from models import UserModel
 from schema import UserSchema
+from blacklist import BLACKLIST
 
 blueprint = Blueprint("Users", "users", description="Operations on users")
 
@@ -55,3 +56,12 @@ class UserLogin(MethodView):
             return {"access_token": access_token}, 200
         
         abort(401, message="Invalid credentials")
+
+
+@blueprint.route("/login")
+class UserLogOut(MethodView):
+    @jwt_required()
+    def delete(self):
+        jti = get_jwt["jti"]
+        BLACKLIST.add(jti)
+        return {"message": "Successfully logged out"}, 200
